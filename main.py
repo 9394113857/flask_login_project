@@ -11,7 +11,7 @@ app.secret_key = 'your secret key'
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'raghu'
-app.config['MYSQL_DB'] = 'pythonlogin'
+app.config['MYSQL_DB'] = 'apis'
 
 # Intialize MySQL
 mysql = MySQL(app)
@@ -54,11 +54,16 @@ def register():
     # Output message if something goes wrong...
     msg = ''
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form   \
+            and 'firstname' in request.form and 'lastname' in request.form and 'phonenumber' in request.form:
         # Create variables for easy access
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
+        firstname = request.form['firstname']
+        lastname = request.form['lastname']
+        phonenumber = request.form['phonenumber']
+
 # Check if account exists using MySQL
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM accounts WHERE username = %s', (username,))
@@ -70,11 +75,11 @@ def register():
             msg = 'Invalid email address!'
         elif not re.match(r'[A-Za-z0-9]+', username):
             msg = 'Username must contain only characters and numbers!'
-        elif not username or not password or not email:
+        elif not username or not password or not email or not firstname or not lastname or not phonenumber:
             msg = 'Please fill out the form!'
         else:
             # Account doesnt exists and the form data is valid, now insert new account into accounts table
-            cursor.execute('INSERT INTO accounts VALUES (NULL, %s, %s, %s)', (username, password, email,))
+            cursor.execute('INSERT INTO accounts(username, password, email, firstname, lastname, phonenumber) VALUES (%s, %s, %s, %s, %s, %s)', (username, password, email, firstname, lastname, phonenumber))
             mysql.connection.commit()
             msg = 'You have successfully registered!'        
     elif request.method == 'POST':
